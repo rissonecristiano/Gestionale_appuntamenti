@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registro Prestazioni</title>
+<meta name="theme-color" content="#f3f6f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1717" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Prestazioni">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-512.png">
+<style>
+/* Layout: app a una colonna per iPhone, intestazione fissa, barra di navigazione in basso con 4 sezioni */
+:root {
+  color-scheme: light;
+  --bg: #f3f6f6; --surface: #ffffff; --surface-2: #e8eeee; --line: #d3dddd; --ink: #12302f; --muted: #5b7271;
+  --accent: #0d7a73; --accent-ink: #ffffff; --accent-soft: #d5ecea; --coral: #d9573b; --coral-soft: #fbe3dc;
+  --s1: #0d7a73; --s2: #c2622c; --s3: #5a55b8; --s4: #b0367a; --s5: #3f7f2a; --s6: #8a6d12;
+  --display: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0e1717; --surface: #162323; --surface-2: #1e2e2e; --line: #2b3f3f; --ink: #e3efee; --muted: #93abaa;
+  --accent: #4fc2b8; --accent-ink: #062120; --accent-soft: #173f3c; --coral: #f08a70; --coral-soft: #3d221b;
+  --s1: #4fc2b8; --s2: #ec955f; --s3: #9f9af0; --s4: #e57ab5; --s5: #8fcb6f; --s6: #d8b850;
+  color-scheme: dark } }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.4;
+  -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.num { font-variant-numeric: tabular-nums; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { position: sticky; top: 0; z-index: 5; background: var(--bg);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: calc(12px + env(safe-area-inset-top, 0px)); padding-bottom: 10px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+header.top h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: -0.01em; }
+header.top .sub { color: var(--muted); font-size: .85rem; }
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: 16px; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); max-width: 640px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 18px; }
+
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+nav.tabs button { background: none; border: 0; padding: 9px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  color: var(--muted); font-size: .72rem; font-weight: 600; letter-spacing: .02em; }
+nav.tabs button svg { width: 24px; height: 24px; }
+nav.tabs button[aria-current="page"] { color: var(--accent); }
+
+.label { font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.15rem; margin: 0; text-wrap: balance; }
+.section { display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+select, input[type=date], input[type=text], input[type=number], textarea {
+  width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 11px; padding: 11px 12px; font-size: 16px; min-height: 46px; }
+input[type=date] { -webkit-appearance: none; appearance: none; }
+textarea { resize: vertical; min-height: 64px; }
+
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 11px; padding: 10px 14px; font-weight: 600; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.danger { color: var(--coral); border-color: var(--coral); background: transparent; }
+.btn.danger.solid { background: var(--coral); color: #fff; }
+.btn.small { padding: 6px 10px; font-size: .86rem; border-radius: 9px; }
+.btn.block { width: 100%; padding: 14px; font-size: 1.02rem; }
+.btn:disabled { opacity: .5; cursor: default; }
+.linkbtn { border: 0; background: none; padding: 4px 0 0; color: var(--accent); font-weight: 600; font-size: .86rem; }
+
+.listino { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.listino button { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px;
+  display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.listino button:active { background: var(--accent-soft); border-color: var(--accent); }
+.listino .n { font-weight: 600; overflow-wrap: anywhere; }
+.listino .p { color: var(--muted); font-size: .88rem; }
+.listino .badge { align-self: flex-start; margin-top: 4px; background: var(--accent); color: var(--accent-ink); font-size: .74rem; font-weight: 700; border-radius: 99px; padding: 1px 8px; }
+
+.cart { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.cart-row { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); align-items: center; }
+.cart-row .n { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.cart-row .p { color: var(--muted); font-size: .86rem; }
+.cart-row .nota { grid-column: 1 / -1; min-height: 40px; padding: 8px 11px; }
+.stepper { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.stepper button { width: 42px; height: 40px; border: 0; background: var(--surface-2); font-size: 1.25rem; font-weight: 600; line-height: 1; }
+.stepper span { min-width: 34px; text-align: center; font-weight: 700; }
+.cart-total { display: flex; justify-content: space-between; align-items: baseline; padding: 14px; background: var(--accent-soft); }
+.cart-total strong { font-family: var(--display); font-size: 1.5rem; }
+.empty { color: var(--muted); padding: 18px 14px; text-align: center; font-size: .93rem; border-bottom: 1px solid var(--line); }
+
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.thumb { position: relative; aspect-ratio: 1; max-width: 100%; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb .x { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 15px; line-height: 1; }
+.addphoto { aspect-ratio: 1; border: 1.5px dashed var(--line); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; color: var(--accent); font-weight: 600; font-size: .8rem; background: transparent; }
+.addphoto svg { width: 26px; height: 26px; }
+
+.note { font-size: .85rem; color: var(--muted); }
+.banner { border-radius: 12px; padding: 10px 12px; font-size: .9rem; background: var(--coral-soft); color: var(--ink); }
+.banner.info { background: var(--accent-soft); }
+
+.calhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.calhead h2 { text-transform: capitalize; }
+.iconbtn { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 1.2rem; font-weight: 700; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .dow { text-align: center; font-size: .7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.cal .d { min-height: 58px; border-radius: 10px; border: 1px solid transparent; background: var(--surface); padding: 5px 2px; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.cal .d.out { visibility: hidden; }
+.cal .d .dn { font-size: .85rem; font-weight: 600; }
+.cal .d.today { border-color: var(--accent); }
+.cal .d.today .dn { color: var(--accent); }
+.cal .d.sel { background: var(--accent); }
+.cal .d.sel .dn, .cal .d.sel .dt { color: var(--accent-ink); }
+.cal .d .dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; }
+.cal .d .dot { width: 6px; height: 6px; border-radius: 50%; }
+.cal .d .dt { font-size: .66rem; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; max-width: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .82rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; }
+.lines { display: flex; flex-direction: column; gap: 4px; font-size: .93rem; }
+.lines .l { display: flex; justify-content: space-between; gap: 10px; }
+.lines .l span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.lines .l.tot { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; font-weight: 700; }
+.confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--coral-soft); border-radius: 10px; padding: 8px 10px; font-size: .9rem; }
+.studio-tot { font-family: var(--display); font-size: 1.3rem; font-weight: 700; }
+details summary { font-weight: 600; cursor: pointer; }
+
+.seg { display: flex; background: var(--surface-2); border-radius: 11px; padding: 3px; gap: 3px; }
+.seg button { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 8px 4px; font-weight: 600; font-size: .88rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.edit-list { display: flex; flex-direction: column; gap: 8px; }
+.edit-item { display: flex; gap: 8px; align-items: center; }
+.edit-item input { flex: 1; min-width: 0; }
+.price-row { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.price-row:last-child { border-bottom: 0; }
+.price-row .n { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+.euro { position: relative; }
+.euro input { padding-left: 26px; text-align: right; }
+.euro::before { content: "€"; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.savebar { position: sticky; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); z-index: 4; }
+
+.lightbox { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.92); display: flex; align-items: center; justify-content: center;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.lightbox img { max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 6px; }
+.lightbox button { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px));
+  width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 20px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 15;
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-weight: 600; font-size: .92rem; max-width: calc(100% - 32px); text-align: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .toast { animation: up .2s ease-out; }
+  @keyframes up { from { transform: translate(-50%, 8px); opacity: 0; } }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Registro Prestazioni</h1>
+  <span class="sub" id="status"></span>
+</header>
+
+<main id="view">
+  <div class="card"><h2>Avvio in corso…</h2><p class="note" style="margin:0">Sto aprendo i dati salvati su questo telefono.</p></div>
+</main>
+
+<nav class="tabs" aria-label="Sezioni">
+  <button data-tab="oggi" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+    Registra</button>
+  <button data-tab="cal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+    Calendario</button>
+  <button data-tab="conto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>
+    Conto</button>
+  <button data-tab="imp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+    Listino</button>
+</nav>
+
+<input type="file" id="fotoInput" accept="image/*" multiple hidden>
+<input type="file" id="backupInput" accept="application/json,.json" hidden>
+<div id="overlay"></div>
+
+<script>
+(() => {
+  /* ================= utilità ================= */
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const eur = n => new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR" }).format(n || 0);
+  const eurShort = n => (Math.round(n) === n ? String(n) : n.toFixed(2).replace(".", ","));
+  const pad = n => String(n).padStart(2, "0");
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayStr = () => ymd(new Date());
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+  const fmtDay = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }); };
+  const fmtIt = d => { const [y, m, g] = d.split("-").map(Number); return `${g}/${m}/${y}`; };
+  const fmtGg = d => { const [y, m, g] = d.split("-").map(Number); return `${g} ${MESI[m - 1].slice(0, 3)}`; };
+  const monthRange = (y, m) => [ymd(new Date(y, m, 1)), ymd(new Date(y, m + 1, 0))];
+  const daysSince = d => Math.floor((new Date(todayStr()) - new Date(d)) / 86400000);
+  const STUDIO_COLORS = ["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)"];
+
+  /* ================= archivio sul telefono (IndexedDB) ================= */
+  let idb = null;
+  function openDB() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("registro-prestazioni", 1);
+      r.onupgradeneeded = () => { const d = r.result;
+        d.createObjectStore("kv"); d.createObjectStore("sessioni", { keyPath: "id" }); d.createObjectStore("foto", { keyPath: "id" }); };
+      r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+    });
+  }
+  function tx(stores, mode, fn) {
+    return new Promise((res, rej) => {
+      const t = idb.transaction(stores, mode); let out;
+      const r = fn(t);
+      if (r && "onsuccess" in r) r.onsuccess = () => { out = r.result; };
+      t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error("abort"));
+    });
+  }
+  const kvGet = k => tx("kv", "readonly", t => t.objectStore("kv").get(k));
+  const kvSet = (k, v) => tx("kv", "readwrite", t => t.objectStore("kv").put(v, k));
+  const sesAll = () => tx("sessioni", "readonly", t => t.objectStore("sessioni").getAll());
+  const sesPut = d => tx("sessioni", "readwrite", t => t.objectStore("sessioni").put(d));
+  const sesDel = id => tx("sessioni", "readwrite", t => t.objectStore("sessioni").delete(id));
+  const fotoPut = f => tx("foto", "readwrite", t => t.objectStore("foto").put(f));
+  const fotoGet = id => tx("foto", "readonly", t => t.objectStore("foto").get(id));
+  const fotoDel = id => tx("foto", "readwrite", t => t.objectStore("foto").delete(id));
+  const fotoAll = () => tx("foto", "readonly", t => t.objectStore("foto").getAll());
+
+  const fotoCache = {};
+  async function fotoUrl(id) {
+    if (fotoCache[id]) return fotoCache[id];
+    const f = await fotoGet(id); if (!f) return null;
+    return fotoCache[id] = URL.createObjectURL(new Blob([f.buf], { type: f.type || "image/jpeg" }));
+  }
+  function hydrateImgs() {
+    document.querySelectorAll("img[data-foto]").forEach(async img => {
+      if (img.getAttribute("src")) return;
+      const u = await fotoUrl(img.dataset.foto).catch(() => null);
+      if (u) img.src = u; else img.alt = "Foto non trovata";
+    });
+  }
+
+  /* ================= stato ================= */
+  let cfg = { studi: [], prestazioni: [], tariffe: {} };
+  let sessioni = [];
+  let ultimoBackup = null;
+  let ready = false, startError = null;
+  let tab = "oggi";
+  const now = new Date();
+  let draft = null;
+  draft = emptyDraft();
+  let saving = false;
+  let cal = { y: now.getFullYear(), m: now.getMonth(), sel: todayStr(), confirmDel: null };
+  const [cDa, cA] = monthRange(now.getFullYear(), now.getMonth());
+  let conto = { da: cDa, a: cA, studio: "tutti" };
+  let imp = { section: "tariffe", studio: null, draft: null, dirty: false, confirmDel: null, restore: null, busy: false };
+  let newStudioOpen = false;
+
+  function emptyDraft() {
+    return { id: null, data: todayStr(), studioId: draft?.studioId || lastStudio(), righe: [], fotoKeep: [], fotoRemoved: [], fotoNew: [], note: "" };
+  }
+  function lastStudio() { try { return localStorage.getItem("ultimoStudio") || ""; } catch { return ""; } }
+  function rememberStudio(id) { try { localStorage.setItem("ultimoStudio", id); } catch {} }
+  const studioById = id => cfg.studi.find(s => s.id === id);
+  const studioColor = id => { const i = cfg.studi.findIndex(s => s.id === id); return STUDIO_COLORS[(i < 0 ? 0 : i) % STUDIO_COLORS.length]; };
+  const tariffa = (sid, pid) => { const v = cfg.tariffe?.[sid]?.[pid]; return typeof v === "number" ? v : null; };
+  const sortSessioni = () => sessioni.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
+
+  /* ================= toast, lightbox, file ================= */
+  let toastT;
+  function toast(msg) {
+    const o = $("#overlay"); o.querySelector(".toast")?.remove();
+    const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; o.appendChild(t);
+    clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2800);
+  }
+  function lightbox(src) {
+    if (!src) return;
+    const lb = document.createElement("div"); lb.className = "lightbox";
+    lb.innerHTML = `<img alt="Foto"><button aria-label="Chiudi">✕</button>`;
+    lb.querySelector("img").src = src; lb.addEventListener("click", () => lb.remove()); $("#overlay").appendChild(lb);
+  }
+  async function salvaFile(blob, nome) {
+    const file = new File([blob], nome, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: nome }); return true; }
+      catch (e) { if (e.name === "AbortError") return false; }
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    return true;
+  }
+  function bufToB64(buf) {
+    const b = new Uint8Array(buf); let s = "";
+    for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function b64ToBuf(s) { const bin = atob(s); const b = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i); return b.buffer; }
+
+  /* ================= render ================= */
+  function setStatus() {
+    $("#status").textContent = ready ? new Date().toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" }) : "Avvio…";
+  }
+  function render() {
+    setStatus();
+    document.querySelectorAll("nav.tabs button").forEach(b => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+    const v = $("#view");
+    if (startError) { v.innerHTML = `<div class="banner">Non riesco ad aprire l'archivio su questo telefono (${esc(startError)}). Se stai usando la navigazione privata di Safari, aprila in una scheda normale.</div>`; return; }
+    if (!ready) return;
+    v.innerHTML = tab === "oggi" ? viewOggi() : tab === "cal" ? viewCal() : tab === "conto" ? viewConto() : viewImp();
+    hydrateImgs();
+  }
+
+  /* --- Registra --- */
+  function backupBanner() {
+    if (!sessioni.length) return "";
+    const giorni = ultimoBackup ? daysSince(ultimoBackup) : null;
+    if (giorni !== null && giorni < 14) return "";
+    return `<div class="banner row"><span class="grow">${giorni === null ? "Non hai ancora fatto un backup dei dati." : `Ultimo backup ${giorni} giorni fa.`} I dati sono solo su questo telefono.</span>
+      <button class="btn small" data-act="vaiBackup">Fai backup</button></div>`;
+  }
+  function viewOggi() {
+    if (!cfg.studi.length) return `<div class="card"><h2>Benvenuta</h2>
+      <p class="note" style="margin:0">Per iniziare aggiungi gli studi in cui lavori, le prestazioni e i compensi di ogni studio. Puoi anche caricare un esempio per provare l'app, oppure ripristinare un backup.</p>
+      <button class="btn primary" data-act="goto" data-tab="imp">Imposta studi e listino</button>
+      <div class="row"><button class="btn" data-act="esempio">Carica un esempio</button><button class="btn" data-act="ripristina">Ripristina un backup</button></div></div>`;
+    if (!studioById(draft.studioId)) draft.studioId = cfg.studi[0].id;
+    const sid = draft.studioId;
+    const offerte = cfg.prestazioni.filter(p => tariffa(sid, p.id) !== null);
+    const qtaDi = pid => draft.righe.find(r => r.prestId === pid)?.qta || 0;
+    const totale = draft.righe.reduce((a, r) => a + r.qta * r.prezzo, 0);
+    const nPrest = draft.righe.reduce((a, r) => a + r.qta, 0);
+    const fotoCount = draft.fotoKeep.length + draft.fotoNew.length;
+    return `${backupBanner()}
+    ${draft.id ? `<div class="banner info row"><span class="grow">Stai modificando la giornata del ${esc(fmtDay(draft.data))}.</span><button class="btn small" data-act="annullaModifica">Annulla</button></div>` : ""}
+    <div class="section">
+      <div class="row">
+        <div class="field grow" style="flex-basis:150px"><label class="label" for="d-data">Giorno</label><input type="date" id="d-data" value="${esc(draft.data)}"></div>
+        <div class="field grow" style="flex-basis:180px"><label class="label" for="d-studio">Studio</label>
+          <select id="d-studio">${cfg.studi.map(s => `<option value="${esc(s.id)}" ${s.id === sid ? "selected" : ""}>${esc(s.nome)}</option>`).join("")}<option value="__nuovo">+ Aggiungi studio…</option></select></div>
+      </div>
+      ${newStudioOpen ? `<div class="card"><label class="label" for="nuovoStudio">Nome del nuovo studio</label>
+        <input type="text" id="nuovoStudio" placeholder="Es. Studio Dentistico Verdi" autocomplete="off">
+        <p class="note" style="margin:0">Le tariffe partono da quelle dello studio attuale: potrai cambiarle nel Listino.</p>
+        <div class="row"><button class="btn primary" data-act="creaStudio">Aggiungi</button><button class="btn" data-act="chiudiStudio">Annulla</button></div></div>` : ""}
+    </div>
+    <div class="section">
+      <div class="row" style="justify-content:space-between"><h2>Prestazioni</h2><span class="note">Tocca per aggiungere</span></div>
+      ${offerte.length ? `<div class="listino">${offerte.map(p => { const q = qtaDi(p.id); return `<button data-act="add" data-pid="${esc(p.id)}">
+          <span class="n">${esc(p.nome)}</span><span class="p num">${eur(tariffa(sid, p.id))}</span>${q ? `<span class="badge num">×${q}</span>` : ""}</button>`; }).join("")}</div>`
+      : `<div class="card"><p class="note" style="margin:0">Per questo studio non ci sono ancora compensi impostati.</p><button class="btn" data-act="goto" data-tab="imp">Imposta i compensi</button></div>`}
+    </div>
+    <div class="section">
+      <div class="row" style="justify-content:space-between"><h2>Carrello della giornata</h2>${nPrest ? `<span class="note num">${nPrest} prestazion${nPrest === 1 ? "e" : "i"}</span>` : ""}</div>
+      <div class="cart">
+        ${draft.righe.length ? draft.righe.map((r, i) => `<div class="cart-row">
+            <div><div class="n">${esc(r.nome)}</div><div class="p num">${eur(r.prezzo)} · ${eur(r.prezzo * r.qta)}</div>
+              ${r.nota === undefined ? `<button class="linkbtn" data-act="addNota" data-i="${i}">+ Nota</button>` : ""}</div>
+            <div class="stepper" role="group" aria-label="Quantità ${esc(r.nome)}">
+              <button data-act="meno" data-i="${i}" aria-label="Togli uno">−</button><span class="num">${r.qta}</span><button data-act="piu" data-i="${i}" aria-label="Aggiungi uno">+</button></div>
+            ${r.nota !== undefined ? `<input type="text" class="nota" id="nota-${i}" data-nota="${i}" value="${esc(r.nota)}" placeholder="Nota su ${esc(r.nome)}" autocomplete="off">` : ""}
+          </div>`).join("") : `<div class="empty">Nessuna prestazione aggiunta. Tocca una voce qui sopra.</div>`}
+        <div class="cart-total"><span class="label">Totale giornata</span><strong class="num">${eur(totale)}</strong></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="row" style="justify-content:space-between"><h2>Foto</h2>${fotoCount ? `<span class="note num">${fotoCount}</span>` : ""}</div>
+      <div class="thumbs">
+        ${draft.fotoKeep.map(id => `<div class="thumb"><img data-foto="${esc(id)}" alt="Foto salvata" data-act="zoom"><button class="x" data-act="rmKeep" data-id="${esc(id)}" aria-label="Rimuovi foto">✕</button></div>`).join("")}
+        ${draft.fotoNew.map((f, i) => `<div class="thumb"><img src="${esc(f.url)}" alt="Nuova foto" data-act="zoom"><button class="x" data-act="rmNew" data-i="${i}" aria-label="Rimuovi foto">✕</button></div>`).join("")}
+        <button class="addphoto" data-act="foto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Aggiungi</button>
+      </div>
+    </div>
+    <div class="field"><label class="label" for="d-note">Note sulla giornata (facoltative)</label>
+      <textarea id="d-note" placeholder="Es. recupero del giovedì">${esc(draft.note)}</textarea></div>
+    <button class="btn primary block" data-act="salva" ${saving ? "disabled" : ""}>${saving ? "Salvataggio in corso…" : draft.id ? "Salva modifiche" : `Salva giornata · ${eur(totale)}`}</button>`;
+  }
+
+  /* --- Calendario --- */
+  function sessioniDel(y, m) { const pre = `${y}-${pad(m + 1)}-`; return sessioni.filter(s => s.data.startsWith(pre)); }
+  function viewCal() {
+    const { y, m } = cal; const mese = sessioniDel(y, m); const perGiorno = {};
+    mese.forEach(s => (perGiorno[s.data] ||= []).push(s));
+    const offset = (new Date(y, m, 1).getDay() + 6) % 7; const nDays = new Date(y, m + 1, 0).getDate(); const oggi = todayStr();
+    let cells = ["lun","mar","mer","gio","ven","sab","dom"].map(d => `<div class="dow">${d}</div>`).join("");
+    for (let i = 0; i < offset; i++) cells += `<div class="d out"></div>`;
+    for (let d = 1; d <= nDays; d++) {
+      const key = `${y}-${pad(m + 1)}-${pad(d)}`; const list = perGiorno[key] || []; const tot = list.reduce((a, s) => a + (s.totale || 0), 0);
+      cells += `<button class="d ${key === oggi ? "today" : ""} ${key === cal.sel ? "sel" : ""}" data-act="selDay" data-day="${key}" aria-label="${d} ${MESI[m]}${list.length ? ", " + eur(tot) : ""}">
+        <span class="dn num">${d}</span>${list.length ? `<span class="dots">${list.map(s => `<i class="dot" style="background:${studioColor(s.studioId)}"></i>`).join("")}</span><span class="dt num">${eurShort(tot)}€</span>` : ""}</button>`;
+    }
+    const studiNelMese = [...new Set(mese.map(s => s.studioId))];
+    const delGiorno = sessioni.filter(s => s.data === cal.sel);
+    return `<div class="calhead"><button class="iconbtn" data-act="calPrev" aria-label="Mese precedente">‹</button>
+        <div style="text-align:center"><h2>${MESI[m]} ${y}</h2><div class="note num">${mese.length} giornat${mese.length === 1 ? "a" : "e"} registrat${mese.length === 1 ? "a" : "e"}</div></div>
+        <button class="iconbtn" data-act="calNext" aria-label="Mese successivo">›</button></div>
+      <div class="cal">${cells}</div>
+      ${studiNelMese.length ? `<div class="legend">${studiNelMese.map(id => `<span><i style="background:${studioColor(id)}"></i>${esc(studioById(id)?.nome || "Studio eliminato")}</span>`).join("")}</div>` : ""}
+      <div class="section"><h2 style="text-transform:capitalize">${esc(fmtDay(cal.sel))}</h2>
+        ${delGiorno.length ? delGiorno.map(sessionCard).join("") : `<div class="card"><p class="note" style="margin:0">Nessuna prestazione registrata in questo giorno.</p>
+          <button class="btn" data-act="registraGiorno" data-day="${cal.sel}">Registra questo giorno</button></div>`}</div>`;
+  }
+  function sessionCard(s) {
+    const nome = studioById(s.studioId)?.nome || s.studioNome || "Studio";
+    return `<div class="card">
+      <div class="row" style="justify-content:space-between"><span class="chip"><i style="background:${studioColor(s.studioId)}"></i>${esc(nome)}</span><strong class="num">${eur(s.totale)}</strong></div>
+      <div class="lines">${(s.righe || []).map(r => `<div class="l"><span>${esc(r.nome)} <span class="note num">× ${r.qta}</span>${r.nota ? `<br><span class="note">${esc(r.nota)}</span>` : ""}</span><span class="num">${eur(r.qta * r.prezzo)}</span></div>`).join("")}</div>
+      ${s.note ? `<p class="note" style="margin:0">${esc(s.note)}</p>` : ""}
+      ${(s.foto || []).length ? `<div class="thumbs">${s.foto.map(id => `<div class="thumb"><img data-foto="${esc(id)}" alt="Foto" data-act="zoom"></div>`).join("")}</div>` : ""}
+      ${cal.confirmDel === s.id
+        ? `<div class="confirm"><span class="grow">Eliminare questa giornata e le sue foto?</span><button class="btn small danger solid" data-act="delOk" data-id="${esc(s.id)}">Elimina</button><button class="btn small" data-act="delNo">Annulla</button></div>`
+        : `<div class="row"><button class="btn small" data-act="modifica" data-id="${esc(s.id)}">Modifica</button><button class="btn small danger" data-act="delAsk" data-id="${esc(s.id)}">Elimina</button></div>`}
+    </div>`;
+  }
+
+  /* --- Conto per periodo e studio --- */
+  const contoSel = () => sessioni.filter(s => s.data >= conto.da && s.data <= conto.a && (conto.studio === "tutti" || s.studioId === conto.studio));
+  const nomeStudio = id => studioById(id)?.nome || sessioni.find(s => s.studioId === id)?.studioNome || "Studio eliminato";
+  function contoData() {
+    const per = {};
+    contoSel().forEach(s => {
+      const o = per[s.studioId] ||= { nome: nomeStudio(s.studioId), tot: 0, giorni: {}, voci: {} };
+      o.tot += s.totale || 0;
+      const g = o.giorni[s.data] ||= { data: s.data, tot: 0, note: [] }; g.tot += s.totale || 0;
+      (s.righe || []).forEach(r => { const v = o.voci[r.nome + "|" + r.prezzo] ||= { nome: r.nome, prezzo: r.prezzo, qta: 0 }; v.qta += r.qta; if (r.nota) g.note.push(`${r.nome}: ${r.nota}`); });
+      if (s.note) g.note.push(s.note);
+    });
+    return Object.entries(per).map(([id, o]) => ({ id, ...o, voci: Object.values(o.voci), giorni: Object.values(o.giorni).sort((x, y) => x.data < y.data ? -1 : 1) }))
+      .sort((x, y) => x.nome.localeCompare(y.nome));
+  }
+  const presetRange = p => p === "cm" ? monthRange(now.getFullYear(), now.getMonth()) : monthRange(now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(), (now.getMonth() + 11) % 12);
+  function viewConto() {
+    const list = conto.da <= conto.a ? contoData() : [];
+    const studiIds = [...new Set([...cfg.studi.map(s => s.id), ...sessioni.map(s => s.studioId)])];
+    const isP = p => { const r = presetRange(p); return conto.da === r[0] && conto.a === r[1]; };
+    return `<h2>Conto per la fattura</h2>
+      <div class="field"><label class="label" for="c-studio">Studio</label><select id="c-studio"><option value="tutti">Tutti gli studi</option>
+        ${studiIds.map(id => `<option value="${esc(id)}" ${conto.studio === id ? "selected" : ""}>${esc(nomeStudio(id))}</option>`).join("")}</select></div>
+      <div class="row">
+        <div class="field grow" style="flex-basis:140px"><label class="label" for="c-da">Dal</label><input type="date" id="c-da" value="${esc(conto.da)}"></div>
+        <div class="field grow" style="flex-basis:140px"><label class="label" for="c-a">Al</label><input type="date" id="c-a" value="${esc(conto.a)}"></div></div>
+      <div class="seg" role="group" aria-label="Periodi rapidi">
+        <button data-act="cPreset" data-p="cm" aria-pressed="${isP("cm")}">Questo mese</button><button data-act="cPreset" data-p="pm" aria-pressed="${isP("pm")}">Mese scorso</button></div>
+      ${conto.da > conto.a ? `<div class="banner">La data di inizio è successiva a quella di fine.</div>` :
+      list.length ? list.map(o => `<div class="card">
+          <div class="row" style="justify-content:space-between;align-items:baseline"><span class="chip"><i style="background:${studioColor(o.id)}"></i>${esc(o.nome)}</span><span class="studio-tot num">${eur(o.tot)}</span></div>
+          <div class="note num">Dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)} · ${o.giorni.length} giornat${o.giorni.length === 1 ? "a" : "e"}</div>
+          <div class="lines">${o.voci.map(v => `<div class="l"><span>${esc(v.nome)} <span class="note num">${v.qta} × ${eur(v.prezzo)}</span></span><span class="num">${eur(v.qta * v.prezzo)}</span></div>`).join("")}
+            <div class="l tot"><span>Da fatturare</span><span class="num">${eur(o.tot)}</span></div></div>
+          <details><summary class="note">Dettaglio delle giornate</summary><div class="lines" style="margin-top:6px">${o.giorni.map(g => `<div class="l"><span>${fmtGg(g.data)}${g.note.length ? `<br><span class="note">${g.note.map(esc).join("<br>")}</span>` : ""}</span><span class="num">${eur(g.tot)}</span></div>`).join("")}</div></details>
+          <button class="btn small" data-act="copia" data-id="${esc(o.id)}" style="align-self:flex-start">Copia per la fattura</button>
+        </div>`).join("") + `<button class="btn block" data-act="csv">Esporta per Excel</button><p class="note" style="margin:0">Crea un file con tutte le prestazioni del periodo e dello studio scelti, apribile con Excel o Numbers.</p><textarea id="copyArea" hidden readonly></textarea>`
+      : `<div class="card"><p class="note" style="margin:0">Nessuna prestazione registrata in questo periodo${conto.studio !== "tutti" ? " per lo studio scelto" : ""}.</p></div>`}`;
+  }
+  function testoRiepilogo(id) {
+    const o = contoData().find(x => x.id === id); if (!o) return "";
+    let t = `${o.nome}\nPrestazioni dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)}\n\n`;
+    o.voci.forEach(v => t += `${v.nome}: ${v.qta} × ${eur(v.prezzo)} = ${eur(v.qta * v.prezzo)}\n`);
+    return t + `\nTotale: ${eur(o.tot)}\nGiornate: ${o.giorni.map(g => fmtGg(g.data)).join(", ")}`;
+  }
+  function csvConto() {
+    const cell = v => { v = String(v ?? ""); return /[";\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+    const num = n => (Math.round(n * 100) / 100).toFixed(2).replace(".", ",");
+    const rows = [["Studio", "Data", "Prestazione", "Quantità", "Compenso", "Importo", "Nota"]];
+    const sel = contoSel().slice().sort((a, b) => nomeStudio(a.studioId).localeCompare(nomeStudio(b.studioId)) || (a.data < b.data ? -1 : 1));
+    sel.forEach(s => (s.righe || []).forEach(r => rows.push([nomeStudio(s.studioId), fmtIt(s.data), r.nome, r.qta, num(r.prezzo), num(r.qta * r.prezzo), r.nota || ""])));
+    rows.push([]);
+    contoData().forEach(o => rows.push([`Totale ${o.nome}`, `dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)}`, "", "", "", num(o.tot), ""]));
+    return "﻿" + rows.map(r => r.map(cell).join(";")).join("\r\n");
+  }
+
+  /* --- Listino e dati --- */
+  function ensureImpDraft() {
+    if (!imp.draft || !imp.dirty) imp.draft = JSON.parse(JSON.stringify(cfg));
+    if (!imp.studio || !imp.draft.studi.some(s => s.id === imp.studio)) imp.studio = imp.draft.studi[0]?.id || null;
+  }
+  function viewImp() {
+    ensureImpDraft();
+    const d = imp.draft;
+    const segs = [["tariffe", "Compensi"], ["studi", "Studi"], ["prest", "Prestazioni"], ["dati", "Backup"]];
+    let body = "";
+    if (imp.section === "tariffe") {
+      body = d.studi.length ? `<div class="field"><label class="label" for="i-studio">Studio</label>
+          <select id="i-studio">${d.studi.map(s => `<option value="${esc(s.id)}" ${s.id === imp.studio ? "selected" : ""}>${esc(s.nome)}</option>`).join("")}</select></div>
+        <div class="card" style="gap:0">${d.prestazioni.length ? d.prestazioni.map(p => { const v = d.tariffe?.[imp.studio]?.[p.id];
+            return `<div class="price-row"><label class="n" for="t-${esc(p.id)}">${esc(p.nome)}</label>
+              <div class="euro"><input type="text" inputmode="decimal" id="t-${esc(p.id)}" data-tar="${esc(p.id)}" value="${typeof v === "number" ? String(v).replace(".", ",") : ""}" placeholder="—"></div></div>`; }).join("")
+          : `<p class="note" style="margin:0">Aggiungi prima qualche prestazione nella scheda Prestazioni.</p>`}</div>
+        <p class="note" style="margin:0">Lascia vuoto il campo se in questo studio non esegui quella prestazione. Le giornate già salvate mantengono i compensi di quel giorno.</p>`
+        : `<p class="note" style="margin:0">Aggiungi prima uno studio nella scheda Studi.</p>`;
+    } else if (imp.section === "studi") {
+      body = `<div class="edit-list">${d.studi.map(s => `<div class="edit-item"><i style="width:12px;height:12px;border-radius:50%;flex:none;background:${studioColor(s.id)}"></i>
+          <input type="text" id="s-${esc(s.id)}" data-studio="${esc(s.id)}" value="${esc(s.nome)}">
+          ${imp.confirmDel === s.id ? `<button class="btn small danger solid" data-act="rmStudioOk" data-id="${esc(s.id)}">Conferma</button>` : `<button class="btn small danger" data-act="rmStudio" data-id="${esc(s.id)}">Elimina</button>`}</div>`).join("")}</div>
+        <button class="btn" data-act="addStudioImp">+ Aggiungi studio</button>
+        <p class="note" style="margin:0">Eliminare uno studio non cancella le giornate già registrate.</p>`;
+    } else if (imp.section === "prest") {
+      body = `<div class="edit-list">${d.prestazioni.map(p => `<div class="edit-item"><input type="text" id="p-${esc(p.id)}" data-prest="${esc(p.id)}" value="${esc(p.nome)}">
+          ${imp.confirmDel === p.id ? `<button class="btn small danger solid" data-act="rmPrestOk" data-id="${esc(p.id)}">Conferma</button>` : `<button class="btn small danger" data-act="rmPrest" data-id="${esc(p.id)}">Elimina</button>`}</div>`).join("")}</div>
+        <button class="btn" data-act="addPrest">+ Aggiungi prestazione</button>
+        <p class="note" style="margin:0">Una nuova prestazione va poi prezzata in Compensi, studio per studio.</p>`;
+    } else {
+      const nFoto = sessioni.reduce((a, s) => a + (s.foto || []).length, 0);
+      body = `<div class="card">
+          <h2>Backup</h2>
+          <p class="note" style="margin:0">Tutti i dati e le foto sono salvati solo su questo iPhone. Il backup crea un unico file da salvare in iCloud Drive o da inviare via mail: se cambi telefono o cancelli i dati di Safari, lo usi per recuperare tutto.</p>
+          <div class="note num">${sessioni.length} giornate · ${nFoto} foto · ultimo backup: ${ultimoBackup ? fmtIt(ultimoBackup) : "mai"}</div>
+          <button class="btn primary" data-act="backup" ${imp.busy ? "disabled" : ""}>${imp.busy ? "Preparo il file…" : "Crea backup"}</button>
+        </div>
+        <div class="card">
+          <h2>Ripristina</h2>
+          <p class="note" style="margin:0">Carica un file di backup. Sostituisce tutti i dati presenti su questo telefono.</p>
+          ${imp.restore ? `<div class="confirm"><span class="grow">Backup del ${fmtIt(imp.restore.creato.slice(0, 10))}: ${imp.restore.sessioni.length} giornate, ${imp.restore.foto.length} foto. Sostituire i dati attuali?</span>
+              <button class="btn small danger solid" data-act="restoreOk">Sostituisci</button><button class="btn small" data-act="restoreNo">Annulla</button></div>`
+            : `<button class="btn" data-act="ripristina">Scegli il file di backup</button>`}
+        </div>`;
+    }
+    return `<h2>Listino e dati</h2>
+      <div class="seg" role="group" aria-label="Sezione">${segs.map(([k, l]) => `<button data-act="seg" data-k="${k}" aria-pressed="${imp.section === k}">${l}</button>`).join("")}</div>
+      ${body}
+      ${imp.section !== "dati" ? `<div class="savebar"><button class="btn primary block" data-act="salvaCfg" ${imp.dirty ? "" : "disabled"}>${imp.dirty ? "Salva il listino" : "Listino salvato"}</button></div>` : ""}`;
+  }
+
+  /* ================= azioni ================= */
+  function addToCart(pid) {
+    const p = cfg.prestazioni.find(x => x.id === pid); const prezzo = tariffa(draft.studioId, pid); if (!p || prezzo === null) return;
+    const r = draft.righe.find(x => x.prestId === pid);
+    if (r) r.qta++; else draft.righe.push({ prestId: pid, nome: p.nome, prezzo, qta: 1 });
+    render();
+  }
+  async function compress(file) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      return (await new Promise(r => c.toBlob(r, "image/jpeg", 0.82))) || file;
+    } catch { return file; }
+  }
+  async function salvaGiornata() {
+    if (saving) return;
+    if (!draft.righe.length) { toast("Aggiungi almeno una prestazione toccandola nell'elenco."); return; }
+    draft.data = $("#d-data")?.value || draft.data || todayStr();
+    draft.note = ($("#d-note")?.value || "").trim();
+    saving = true; render();
+    try {
+      const ids = [...draft.fotoKeep];
+      for (const f of draft.fotoNew) {
+        const blob = await compress(f.file); const id = newId();
+        await fotoPut({ id, type: blob.type || "image/jpeg", buf: await blob.arrayBuffer() });
+        ids.push(id);
+      }
+      const doc = { id: draft.id || newId(), data: draft.data, studioId: draft.studioId, studioNome: studioById(draft.studioId)?.nome || "",
+        righe: draft.righe.map(r => { const o = { prestId: r.prestId, nome: r.nome, prezzo: r.prezzo, qta: r.qta }; const n = (r.nota || "").trim(); if (n) o.nota = n; return o; }),
+        totale: Math.round(draft.righe.reduce((a, r) => a + r.qta * r.prezzo, 0) * 100) / 100,
+        foto: ids, note: draft.note, aggiornato: new Date().toISOString() };
+      await sesPut(doc);
+      for (const old of draft.fotoRemoved) fotoDel(old).catch(() => {});
+      sessioni = sessioni.filter(s => s.id !== doc.id); sessioni.push(doc); sortSessioni();
+      draft.fotoNew.forEach(f => URL.revokeObjectURL(f.url));
+      const wasEdit = !!draft.id; rememberStudio(draft.studioId);
+      draft = emptyDraft(); saving = false;
+      if (wasEdit) { tab = "cal"; cal.sel = doc.data; }
+      render(); toast(wasEdit ? "Modifiche salvate" : "Giornata salvata");
+    } catch (e) {
+      saving = false; render();
+      toast(e?.name === "QuotaExceededError" ? "Spazio esaurito sul telefono: elimina qualche foto vecchia." : "Salvataggio non riuscito. Riprova.");
+    }
+  }
+  function modifica(id) {
+    const s = sessioni.find(x => x.id === id); if (!s) return;
+    draft.fotoNew.forEach(f => URL.revokeObjectURL(f.url));
+    draft = { id: s.id, data: s.data, studioId: s.studioId, righe: (s.righe || []).map(r => ({ ...r })), fotoKeep: [...(s.foto || [])], fotoRemoved: [], fotoNew: [], note: s.note || "" };
+    tab = "oggi"; render(); window.scrollTo(0, 0);
+  }
+  async function elimina(id) {
+    const s = sessioni.find(x => x.id === id); cal.confirmDel = null;
+    try {
+      await sesDel(id); for (const f of s?.foto || []) fotoDel(f).catch(() => {});
+      sessioni = sessioni.filter(x => x.id !== id); toast("Giornata eliminata");
+    } catch { toast("Eliminazione non riuscita. Riprova."); }
+    render();
+  }
+  async function salvaConfig(nc, msg) {
+    try { await kvSet("config", nc); cfg = nc; imp.dirty = false; imp.draft = null; render(); toast(msg || "Listino salvato"); return true; }
+    catch { toast("Salvataggio del listino non riuscito."); return false; }
+  }
+  async function creaStudioRapido() {
+    const nome = ($("#nuovoStudio")?.value || "").trim(); if (!nome) { toast("Scrivi il nome dello studio."); return; }
+    const id = newId(); const nc = JSON.parse(JSON.stringify(cfg));
+    nc.studi.push({ id, nome }); nc.tariffe[id] = { ...(cfg.tariffe?.[draft.studioId] || {}) };
+    if (await salvaConfig(nc, "Studio aggiunto")) { newStudioOpen = false; draft.studioId = id; draft.righe = []; rememberStudio(id); render(); }
+  }
+  async function creaBackup() {
+    imp.busy = true; render();
+    try {
+      const foto = await fotoAll();
+      const obj = { app: "registro-prestazioni", versione: 1, creato: new Date().toISOString(), cfg, sessioni,
+        foto: foto.map(f => ({ id: f.id, type: f.type, data: bufToB64(f.buf) })) };
+      const blob = new Blob([JSON.stringify(obj)], { type: "application/json" });
+      imp.busy = false; render();
+      if (await salvaFile(blob, `backup-prestazioni-${todayStr()}.json`)) {
+        ultimoBackup = todayStr(); await kvSet("ultimoBackup", ultimoBackup); render(); toast("Backup creato");
+      }
+    } catch { imp.busy = false; render(); toast("Backup non riuscito. Riprova."); }
+  }
+  async function leggiBackup(file) {
+    try {
+      const obj = JSON.parse(await file.text());
+      if (obj?.app !== "registro-prestazioni" || !obj.cfg || !Array.isArray(obj.sessioni)) throw new Error();
+      obj.foto ||= []; imp.restore = obj; imp.section = "dati"; tab = "imp"; render();
+    } catch { toast("Questo file non è un backup del Registro Prestazioni."); }
+  }
+  async function applicaBackup() {
+    const b = imp.restore; imp.restore = null;
+    try {
+      await tx(["kv", "sessioni", "foto"], "readwrite", t => {
+        const kv = t.objectStore("kv"), ss = t.objectStore("sessioni"), fs = t.objectStore("foto");
+        ss.clear(); fs.clear(); kv.put(b.cfg, "config");
+        b.sessioni.forEach(s => ss.put(s));
+        b.foto.forEach(f => fs.put({ id: f.id, type: f.type, buf: b64ToBuf(f.data) }));
+      });
+      Object.values(fotoCache).forEach(u => URL.revokeObjectURL(u)); Object.keys(fotoCache).forEach(k => delete fotoCache[k]);
+      cfg = { studi: b.cfg.studi || [], prestazioni: b.cfg.prestazioni || [], tariffe: b.cfg.tariffe || {} };
+      sessioni = b.sessioni; sortSessioni(); imp.draft = null; imp.dirty = false; draft = emptyDraft();
+      render(); toast("Dati ripristinati");
+    } catch { render(); toast("Ripristino non riuscito: i dati attuali non sono stati toccati."); }
+  }
+  async function caricaEsempio() {
+    const nc = { studi: [{ id: "studioA", nome: "Studio A (esempio)" }, { id: "studioB", nome: "Studio B (esempio)" }],
+      prestazioni: [{ id: "p1", nome: "Prestazione 1" }, { id: "p2", nome: "Prestazione 2" }, { id: "p3", nome: "Prestazione 3" }],
+      tariffe: { studioA: { p1: 30, p2: 45, p3: 20 }, studioB: { p1: 35, p2: 40, p3: 25 } } };
+    await salvaConfig(nc, "Esempio caricato: modificalo dal Listino");
+  }
+
+  /* ================= eventi ================= */
+  document.querySelector("nav.tabs").addEventListener("click", e => {
+    const b = e.target.closest("button[data-tab]"); if (!b) return;
+    tab = b.dataset.tab; cal.confirmDel = null; render(); window.scrollTo(0, 0);
+  });
+  $("#view").addEventListener("click", async e => {
+    const el = e.target.closest("[data-act]"); if (!el) return;
+    const a = el.dataset.act, i = +el.dataset.i;
+    if (a === "goto") { tab = el.dataset.tab; render(); }
+    else if (a === "add") addToCart(el.dataset.pid);
+    else if (a === "addNota") { draft.righe[i].nota = ""; render(); $(`#nota-${i}`)?.focus(); }
+    else if (a === "piu") { draft.righe[i].qta++; render(); }
+    else if (a === "meno") { const r = draft.righe[i]; r.qta--; if (r.qta <= 0) draft.righe.splice(i, 1); render(); }
+    else if (a === "foto") $("#fotoInput").click();
+    else if (a === "rmNew") { const [f] = draft.fotoNew.splice(i, 1); if (f) URL.revokeObjectURL(f.url); render(); }
+    else if (a === "rmKeep") { draft.fotoKeep = draft.fotoKeep.filter(x => x !== el.dataset.id); draft.fotoRemoved.push(el.dataset.id); render(); }
+    else if (a === "zoom") lightbox(el.src);
+    else if (a === "salva") salvaGiornata();
+    else if (a === "annullaModifica") { draft.fotoNew.forEach(f => URL.revokeObjectURL(f.url)); draft = emptyDraft(); render(); }
+    else if (a === "creaStudio") creaStudioRapido();
+    else if (a === "chiudiStudio") { newStudioOpen = false; render(); }
+    else if (a === "vaiBackup") { tab = "imp"; imp.section = "dati"; render(); window.scrollTo(0, 0); }
+    else if (a === "esempio") caricaEsempio();
+    else if (a === "calPrev" || a === "calNext") { cal.m += a === "calNext" ? 1 : -1; if (cal.m < 0) { cal.m = 11; cal.y--; } if (cal.m > 11) { cal.m = 0; cal.y++; } render(); }
+    else if (a === "selDay") { cal.sel = el.dataset.day; cal.confirmDel = null; render(); }
+    else if (a === "registraGiorno") { if (!draft.id) draft.data = el.dataset.day; tab = "oggi"; render(); window.scrollTo(0, 0); }
+    else if (a === "modifica") modifica(el.dataset.id);
+    else if (a === "delAsk") { cal.confirmDel = el.dataset.id; render(); }
+    else if (a === "delNo") { cal.confirmDel = null; render(); }
+    else if (a === "delOk") elimina(el.dataset.id);
+    else if (a === "cPreset") { [conto.da, conto.a] = presetRange(el.dataset.p); render(); }
+    else if (a === "copia") {
+      const txt = testoRiepilogo(el.dataset.id);
+      try { await navigator.clipboard.writeText(txt); toast("Riepilogo copiato"); }
+      catch { const ta = $("#copyArea"); ta.hidden = false; ta.value = txt; ta.style.minHeight = "200px"; ta.focus(); ta.select(); toast("Seleziona e copia il testo qui sotto"); }
+    }
+    else if (a === "csv") {
+      const st = conto.studio === "tutti" ? "tutti-gli-studi" : nomeStudio(conto.studio).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      salvaFile(new Blob([csvConto()], { type: "text/csv" }), `prestazioni-${st}-${conto.da}-${conto.a}.csv`);
+    }
+    else if (a === "seg") { imp.section = el.dataset.k; imp.confirmDel = null; render(); }
+    else if (a === "addStudioImp") { ensureImpDraft(); const id = newId(); imp.draft.studi.push({ id, nome: "Nuovo studio" }); imp.draft.tariffe[id] = {}; imp.dirty = true; render(); $(`#s-${id}`)?.select(); }
+    else if (a === "addPrest") { ensureImpDraft(); const id = newId(); imp.draft.prestazioni.push({ id, nome: "Nuova prestazione" }); imp.dirty = true; render(); $(`#p-${id}`)?.select(); }
+    else if (a === "rmStudio" || a === "rmPrest") { imp.confirmDel = el.dataset.id; render(); }
+    else if (a === "rmStudioOk") { imp.draft.studi = imp.draft.studi.filter(s => s.id !== el.dataset.id); delete imp.draft.tariffe[el.dataset.id]; imp.dirty = true; imp.confirmDel = null; render(); }
+    else if (a === "rmPrestOk") { const id = el.dataset.id; imp.draft.prestazioni = imp.draft.prestazioni.filter(p => p.id !== id); Object.values(imp.draft.tariffe).forEach(t => delete t[id]); imp.dirty = true; imp.confirmDel = null; render(); }
+    else if (a === "salvaCfg") {
+      const d = imp.draft;
+      d.studi.forEach(s => s.nome = s.nome.trim() || "Studio senza nome");
+      d.prestazioni.forEach(p => p.nome = p.nome.trim() || "Prestazione senza nome");
+      salvaConfig(d);
+    }
+    else if (a === "backup") creaBackup();
+    else if (a === "ripristina") $("#backupInput").click();
+    else if (a === "restoreOk") applicaBackup();
+    else if (a === "restoreNo") { imp.restore = null; render(); }
+  });
+  $("#view").addEventListener("change", e => {
+    const t = e.target;
+    if (t.id === "d-studio") {
+      if (t.value === "__nuovo") { newStudioOpen = true; t.value = draft.studioId; render(); $("#nuovoStudio")?.focus(); return; }
+      if (draft.righe.length && t.value !== draft.studioId) toast("Carrello svuotato: i compensi cambiano da studio a studio");
+      draft.studioId = t.value; draft.righe = []; rememberStudio(t.value); render();
+    }
+    else if (t.id === "d-data") draft.data = t.value || todayStr();
+    else if (t.id === "i-studio") { imp.studio = t.value; render(); }
+    else if (t.id === "c-studio") { conto.studio = t.value; render(); }
+    else if (t.id === "c-da" || t.id === "c-a") { if (t.value) conto[t.id === "c-da" ? "da" : "a"] = t.value; render(); }
+  });
+  $("#view").addEventListener("input", e => {
+    const t = e.target;
+    if (t.id === "d-note") draft.note = t.value;
+    else if (t.dataset.nota !== undefined) { const r = draft.righe[+t.dataset.nota]; if (r) r.nota = t.value; }
+    else if (t.dataset.tar) {
+      ensureImpDraft(); const v = t.value.trim().replace(",", ".");
+      imp.draft.tariffe[imp.studio] ||= {};
+      if (v === "") delete imp.draft.tariffe[imp.studio][t.dataset.tar]; else if (!isNaN(+v)) imp.draft.tariffe[imp.studio][t.dataset.tar] = Math.round(+v * 100) / 100;
+      markDirty();
+    }
+    else if (t.dataset.studio) { const s = imp.draft.studi.find(x => x.id === t.dataset.studio); if (s) { s.nome = t.value; markDirty(); } }
+    else if (t.dataset.prest) { const p = imp.draft.prestazioni.find(x => x.id === t.dataset.prest); if (p) { p.nome = t.value; markDirty(); } }
+  });
+  function markDirty() {
+    if (imp.dirty) return; imp.dirty = true;
+    const b = document.querySelector('[data-act="salvaCfg"]'); if (b) { b.disabled = false; b.textContent = "Salva il listino"; }
+  }
+  $("#fotoInput").addEventListener("change", e => {
+    for (const f of e.target.files) if (!f.type || f.type.startsWith("image/")) draft.fotoNew.push({ file: f, url: URL.createObjectURL(f) });
+    e.target.value = ""; render();
+  });
+  $("#backupInput").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) leggiBackup(f); });
+
+  /* ================= avvio ================= */
+  (async () => {
+    try {
+      idb = await openDB();
+      const c = await kvGet("config");
+      if (c) cfg = { studi: c.studi || [], prestazioni: c.prestazioni || [], tariffe: c.tariffe || {} };
+      sessioni = (await sesAll()) || []; sortSessioni();
+      ultimoBackup = (await kvGet("ultimoBackup")) || null;
+      ready = true;
+      navigator.storage?.persist?.().catch(() => {});
+    } catch (e) { startError = e?.message || "errore sconosciuto"; }
+    render();
+  })();
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
