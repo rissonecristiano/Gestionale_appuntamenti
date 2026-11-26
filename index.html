@@ -139,6 +139,10 @@ textarea { resize: vertical; min-height: 64px; }
 .lines .l span:first-child { min-width: 0; overflow-wrap: anywhere; }
 .lines .l.tot { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; font-weight: 700; }
 .confirm { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: var(--coral-soft); border-radius: 10px; padding: 8px 10px; font-size: .9rem; }
+.grand { background: var(--ink); color: var(--bg); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.grand .top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.grand strong { font-family: var(--display); font-size: 1.8rem; }
+.grand .sub { opacity: .75; font-size: .85rem; }
 .studio-tot { font-family: var(--display); font-size: 1.3rem; font-weight: 700; }
 details summary { font-weight: 600; cursor: pointer; }
 
@@ -460,7 +464,10 @@ details summary { font-weight: 600; cursor: pointer; }
       <div class="seg" role="group" aria-label="Periodi rapidi">
         <button data-act="cPreset" data-p="cm" aria-pressed="${isP("cm")}">Questo mese</button><button data-act="cPreset" data-p="pm" aria-pressed="${isP("pm")}">Mese scorso</button></div>
       ${conto.da > conto.a ? `<div class="banner">La data di inizio è successiva a quella di fine.</div>` :
-      list.length ? list.map(o => `<div class="card">
+      list.length ? (conto.studio === "tutti" ? (() => { const tot = list.reduce((a, o) => a + o.tot, 0);
+        const gg = new Set(list.flatMap(o => o.giorni.map(g => g.data))).size;
+        return `<div class="grand"><div class="top"><span>Totale tutti gli studi</span><strong class="num">${eur(tot)}</strong></div>
+          <span class="sub num">Dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)} · ${list.length} stud${list.length === 1 ? "io" : "i"} · ${gg} giornat${gg === 1 ? "a" : "e"}</span></div>`; })() : "") + list.map(o => `<div class="card">
           <div class="row" style="justify-content:space-between;align-items:baseline"><span class="chip"><i style="background:${studioColor(o.id)}"></i>${esc(o.nome)}</span><span class="studio-tot num">${eur(o.tot)}</span></div>
           <div class="note num">Dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)} · ${o.giorni.length} giornat${o.giorni.length === 1 ? "a" : "e"}</div>
           <div class="lines">${o.voci.map(v => `<div class="l"><span>${esc(v.nome)} <span class="note num">${v.qta} × ${eur(v.prezzo)}</span></span><span class="num">${eur(v.qta * v.prezzo)}</span></div>`).join("")}
@@ -483,7 +490,9 @@ details summary { font-weight: 600; cursor: pointer; }
     const sel = contoSel().slice().sort((a, b) => nomeStudio(a.studioId).localeCompare(nomeStudio(b.studioId)) || (a.data < b.data ? -1 : 1));
     sel.forEach(s => (s.righe || []).forEach(r => rows.push([nomeStudio(s.studioId), fmtIt(s.data), r.nome, r.qta, num(r.prezzo), num(r.qta * r.prezzo), r.nota || ""])));
     rows.push([]);
-    contoData().forEach(o => rows.push([`Totale ${o.nome}`, `dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)}`, "", "", "", num(o.tot), ""]));
+    const cd = contoData();
+    cd.forEach(o => rows.push([`Totale ${o.nome}`, `dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)}`, "", "", "", num(o.tot), ""]));
+    if (cd.length > 1) rows.push(["Totale tutti gli studi", `dal ${fmtIt(conto.da)} al ${fmtIt(conto.a)}`, "", "", "", num(cd.reduce((a, o) => a + o.tot, 0)), ""]);
     return "﻿" + rows.map(r => r.map(cell).join(";")).join("\r\n");
   }
 

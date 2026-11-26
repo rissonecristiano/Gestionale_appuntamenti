@@ -1,6 +1,6 @@
 // Fa funzionare l'app anche senza connessione.
 // Con la rete prende sempre la versione più recente; senza rete usa la copia salvata.
-const CACHE = "registro-prestazioni-v1";
+const CACHE = "registro-prestazioni-v2";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-180.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
